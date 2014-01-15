@@ -16,19 +16,19 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 public class AmazonSQSOfflineListener implements OfflineMessageListener {
-	
+
 	private OfflineAmazonSQSPlugin plugin;
 
 	private static final AmazonSQSOfflineListener instance = new AmazonSQSOfflineListener();
-	
+
 	private static final Logger Log = LoggerFactory.getLogger(AmazonSQSOfflineListener.class);
-	
+
 	private AmazonSQS mSqs;
 
 	public static AmazonSQSOfflineListener getInstance() {
 		return instance;
 	}
-	
+
 	public AmazonSQSOfflineListener() {
 		plugin = (OfflineAmazonSQSPlugin) XMPPServer.getInstance()
 					.getPluginManager().getPlugin("offlineamazonsqs");
@@ -47,12 +47,12 @@ public class AmazonSQSOfflineListener implements OfflineMessageListener {
 	public void messageStored(Message message) {
 		sendToSQS(message);
 	}
-		
+
 	private void sendToSQS(Message message) {
 		try {
 			String queueUrl = "";
-			String msg = "{\"to\":\""+ message.getTo() + "\",\"from\":\"" + 
-							message.getFrom() + "\",\"message\":\"" + 
+			String msg = "{\"to\":\""+ message.getTo() + "\",\"from\":\"" +
+							message.getFrom() + "\",\"message\":\"" +
 							message.getBody() + "\"}";
 			mSqs.sendMessage(new SendMessageRequest(queueUrl, msg));
 		} catch (AmazonServiceException ase) {

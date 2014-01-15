@@ -14,6 +14,7 @@ public class OfflineAmazonSQSPlugin implements Plugin, PropertyEventListener {
 
 	private String awsAccessKey;
 	private String awsSecretKey;
+	private String awsSqsQueueUrl;
 	private boolean enabled;
 
 	@Override
@@ -21,6 +22,7 @@ public class OfflineAmazonSQSPlugin implements Plugin, PropertyEventListener {
 
         awsAccessKey = JiveGlobals.getProperty("plugin.offline_sqs.aws_access_key", "");
         awsSecretKey = JiveGlobals.getProperty("plugin.offline_sqs.aws_secret_key", "");
+        awsSqsQueueUrl = JiveGlobals.getProperty("plugin.offline_sqs.aws_sqs_queue_url", "");
 
         // See if the service is enabled or not.
         enabled = JiveGlobals.getBooleanProperty("plugin.offline_sqs.enabled", false);
@@ -49,7 +51,7 @@ public class OfflineAmazonSQSPlugin implements Plugin, PropertyEventListener {
     /**
      * Sets the AWS secret key.
      *
-     * @param secret the AWS secret key.
+     * @param key the AWS secret key.
      */
     public void setAWSAccessKey(String key) {
         JiveGlobals.setProperty("plugin.offline_sqs.aws_access_key", key);
@@ -73,6 +75,25 @@ public class OfflineAmazonSQSPlugin implements Plugin, PropertyEventListener {
     public void setAWSSecretKey(String secret) {
         JiveGlobals.setProperty("plugin.offline_sqs.aws_secret_key", secret);
         this.awsSecretKey = secret;
+    }
+    
+    /**
+     * Returns the AWS SQS Queue.
+     *
+     * @return the AWS SQS Queue.
+     */
+    public String getAWSSQSQueueUrl() {
+        return awsSqsQueueUrl;
+    }
+
+    /**
+     * Sets the the AWS SQS Queue.
+     *
+     * @param url the AWS SQS Queue.
+     */
+    public void setAWSSQSQueueUrl(String url) {
+        JiveGlobals.setProperty("plugin.offline_sqs.aws_sqs_queue_url", url);
+        this.awsSqsQueueUrl = url;
     }
 
     /**
@@ -103,6 +124,9 @@ public class OfflineAmazonSQSPlugin implements Plugin, PropertyEventListener {
         }
         else if (property.equals("plugin.offline_sqs.aws_secret_key")) {
             this.awsSecretKey = "";
+        }
+        else if (property.equals("plugin.offline_sqs.aws_sqs_queue_url")) {
+            this.awsSqsQueueUrl = "";
         }
 	}
 

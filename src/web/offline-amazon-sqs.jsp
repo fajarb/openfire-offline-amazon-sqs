@@ -1,7 +1,7 @@
 <%@ page import="java.util.*,
                  org.jivesoftware.openfire.XMPPServer,
                  org.jivesoftware.util.*,
-                 com.uniqapp.openfire.OfflineAmazonSQSPlugin"
+                 com.barlabs.openfire.OfflineAmazonSQSPlugin"
     errorPage="error.jsp"
 %>
 
@@ -18,6 +18,7 @@
     boolean success = request.getParameter("success") != null;
     String awsAccessKey = ParamUtils.getParameter(request, "aws_access_key");
     String awsSecretKey = ParamUtils.getParameter(request, "aws_secret_key");
+    String awsSqsQueueUrl = ParamUtils.getParameter(request, "aws_sqs_queue_url");
     boolean enabled = ParamUtils.getBooleanParameter(request, "enabled");
 
     // OfflineAmazonSQSPlugin plugin = (OfflineAmazonSQSPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("offlineAmazonSQS");
@@ -30,6 +31,7 @@
            plugin.setEnabled(enabled);
            plugin.setAWSAccessKey(awsAccessKey);
            plugin.setAWSSecretKey(awsSecretKey);
+           plugin.setAWSSQSQueueUrl(awsSqsQueueUrl);
            response.sendRedirect("offline-amazon-sqs.jsp?success=true");
            return;
        }
@@ -37,6 +39,7 @@
 
     awsAccessKey = plugin.getAWSAccessKey();
     awsSecretKey = plugin.getAWSSecretKey();
+    awsSqsQueueUrl = plugin.getAWSSQSQueueUrl();
     enabled = plugin.isEnabled();
 %>
 
@@ -84,6 +87,10 @@
 
         <label for="text_secret">AWS Secret Key:</label>
         <input type="text" name="aws_secret_key" value="<%= awsSecretKey %>" id="text_secret" size="50">
+        <br><br>
+
+        <label for="text_secret">AWS SQS Queue URL:</label>
+        <input type="text" name="aws_sqs_queue_url" value="<%= awsSqsQueueUrl %>" id="text_queue" size="50">
         <br><br>
 
     </ul>
