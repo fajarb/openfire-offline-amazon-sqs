@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Plugin configuration for the broadcast plugin.
+-->
+<plugin>
+    <class>com.barlabs.openfire.OfflineAmazonSQSPlugin</class>
+    <name>Offline Amazon SQS</name>
+    <description>Listen to offline messages and send them to Amazon SQS</description>
+    <author>Fajar B</author>
+    <version>0.0.1</version>
+    <date>1/11/2014</date>
+    <minServerVersion>3.8.2</minServerVersion>
+
+    <adminconsole>
+        <tab id="tab-server">
+            <sidebar id="sidebar-server-settings">
+                <item id="offline-amazon-sqs" name="Offline Amazon SQS"
+                        url="offline-amazon-sqs.jsp"
+                        description="Click to manage AWS credentials" />
+            </sidebar>
+        </tab>
+    </adminconsole>
+</plugin>
