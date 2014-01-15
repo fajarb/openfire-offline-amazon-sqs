@@ -49,27 +49,28 @@ public class AmazonSQSOfflineListener implements OfflineMessageListener {
 	}
 
 	private void sendToSQS(Message message) {
-		try {
-			String queueUrl = plugin.getAWSSQSQueueUrl();
-			String msg = "{\"to\":\""+ message.getTo() + "\",\"from\":\"" +
-							message.getFrom() + "\",\"message\":\"" +
-							message.getBody() + "\"}";
-			mSqs.sendMessage(new SendMessageRequest(queueUrl, msg));
-		} catch (AmazonServiceException ase) {
-			Log.error("Caught an AmazonServiceException, which means your request made it " +
-                    "to Amazon SQS, but was rejected with an error response for some reason.");
-            Log.error("Error Message:    " + ase.getMessage(), ase);
-            Log.error("HTTP Status Code: " + ase.getStatusCode(), ase);
-            Log.error("AWS Error Code:   " + ase.getErrorCode(), ase);
-            Log.error("Error Type:       " + ase.getErrorType(), ase);
-            Log.error("Request ID:       " + ase.getRequestId());
-        } catch (AmazonClientException ace) {
-        	Log.error("Caught an AmazonClientException, which means the client encountered " +
-                    "a serious internal problem while trying to communicate with SQS, such as not " +
-                    "being able to access the network.", ace);
-        	Log.error("Error Message: " + ace.getMessage(), ace);
-        }
+		if (!message.getBody().equals("$!{uniq-ignore}")) {
+			try {
+				String queueUrl = plugin.getAWSSQSQueueUrl();
+				String msg = "{\"to\":\""+ message.getTo() + "\",\"from\":\"" +
+								message.getFrom() + "\",\"message\":\"" +
+								message.getBody() + "\"}";
+				mSqs.sendMessage(new SendMessageRequest(queueUrl, msg));
+			} catch (AmazonServiceException ase) {
+				Log.error("Caught an AmazonServiceException, which means your request made it " +
+	                    "to Amazon SQS, but was rejected with an error response for some reason.");
+	            Log.error("Error Message:    " + ase.getMessage(), ase);
+	            Log.error("HTTP Status Code: " + ase.getStatusCode(), ase);
+	            Log.error("AWS Error Code:   " + ase.getErrorCode(), ase);
+	            Log.error("Error Type:       " + ase.getErrorType(), ase);
+	            Log.error("Request ID:       " + ase.getRequestId());
+	        } catch (AmazonClientException ace) {
+	        	Log.error("Caught an AmazonClientException, which means the client encountered " +
+	                    "a serious internal problem while trying to communicate with SQS, such as not " +
+	                    "being able to access the network.", ace);
+	        	Log.error("Error Message: " + ace.getMessage(), ace);
+	        }
+		}
 	}
-
 }
 
