@@ -50,7 +50,7 @@ public class AmazonSQSOfflineListener implements OfflineMessageListener {
 
 	private void sendToSQS(Message message) {
 		try {
-			String queueUrl = "";
+			String queueUrl = plugin.getAWSSQSQueueUrl();
 			String msg = "{\"to\":\""+ message.getTo() + "\",\"from\":\"" +
 							message.getFrom() + "\",\"message\":\"" +
 							message.getBody() + "\"}";
