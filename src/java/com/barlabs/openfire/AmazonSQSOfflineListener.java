@@ -14,9 +14,13 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 
 public class AmazonSQSOfflineListener implements OfflineMessageListener {
 
+	private static final String IGNORED_STRING = "$!{uniq-ignore}";
+	
 	private OfflineAmazonSQSPlugin plugin;
 
 	private static final AmazonSQSOfflineListener instance = new AmazonSQSOfflineListener();
@@ -49,13 +53,38 @@ public class AmazonSQSOfflineListener implements OfflineMessageListener {
 	}
 
 	private void sendToSQS(Message message) {
-		if (!message.getBody().equals("$!{uniq-ignore}")) {
+		Log.info("=== message body: " + message.getBody());
+		Log.info("=== message body length: " + message.getBody().length());
+		Log.info("=== message body type: " + message.getType());
+		Log.info("=== message body subject: " + message.getSubject());
+		Log.info("=== message body class: " + message.getBody().getClass());
+
+		if (!message.getBody().equals(IGNORED_STRING)) {
 			try {
-				String queueUrl = plugin.getAWSSQSQueueUrl();
-				String msg = "{\"to\":\""+ message.getTo() + "\",\"from\":\"" +
-								message.getFrom() + "\",\"message\":\"" +
-								message.getBody() + "\"}";
-				mSqs.sendMessage(new SendMessageRequest(queueUrl, msg));
+				String messageBody = "";
+				JSONObject messageJSON;
+				try {
+					messageJSON = new JSONObject(message.getBody());
+					if (messageJSON.has("thumbnail")) {
+						messageBody = "image";
+						Log.info("== Image chat: " + messageBody);
+					} else if (messageJSON.has("fileName")) {
+						messageBody = messageJSON.getString("fileName");
+						Log.info("== File chat: " + messageBody);
+					}
+				} catch (JSONException e) {
+					// Text chat
+					messageBody = message.getBody();
+					Log.info("== Text chat: " + messageBody);
+				}
+
+				JSONObject payload = new JSONObject();
+				payload.put("to", message.getTo().toBareJID());
+				payload.put("from", message.getFrom().toBareJID());
+				payload.put("message", messageBody);
+				
+				mSqs.sendMessage(new SendMessageRequest(plugin.getAWSSQSQueueUrl(), payload.toString()));
+				
 			} catch (AmazonServiceException ase) {
 				Log.error("Caught an AmazonServiceException, which means your request made it " +
 	                    "to Amazon SQS, but was rejected with an error response for some reason.");
@@ -69,6 +98,9 @@ public class AmazonSQSOfflineListener implements OfflineMessageListener {
 	                    "a serious internal problem while trying to communicate with SQS, such as not " +
 	                    "being able to access the network.", ace);
 	        	Log.error("Error Message: " + ace.getMessage(), ace);
+	        } catch (JSONException e) {
+	        	// TODO: Do something here
+	        	Log.error("Error Message: " + e.getMessage(), e);
 	        }
 		}
 	}
